@@ -4,8 +4,8 @@ const fs = require('fs');
 const manifest = {
     "manifest_version": 3,
     "name": "Grabbit",
-    "description": "Quickly find your Google Drive files using natural language descriptions.",
-    "version": "1.0.1",
+    "description": "Enhance your Google searches with Google Drive results.",
+    "version": "1.0.5",
     "icons": {
         "128": "icons/icon128.png"
     },
@@ -14,7 +14,8 @@ const manifest = {
         "storage",
         "activeTab",
         "scripting",
-        "https://www.googleapis.com/"
+        "https://www.googleapis.com/",
+        "https://www.google.com/*"
     ],
     "oauth2": {
         "client_id": process.env.GOOGLE_CLIENT_ID,
@@ -33,7 +34,14 @@ const manifest = {
             "48": "icons/icon48.png",
             "128": "icons/icon128.png"
         }
-    }
+    },
+    "content_scripts": [
+        {
+            "matches": ["https://www.google.com/search*"],
+            "js": ["contentScript.js"],
+            "run_at": "document_end"
+        }
+    ]
 };
 
 fs.writeFileSync('manifest.json', JSON.stringify(manifest, null, 2));

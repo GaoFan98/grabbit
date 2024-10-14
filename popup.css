@@ -1,5 +1,3 @@
-/* popup.css */
-
 body {
     font-family: 'Roboto', Arial, sans-serif;
     width: 350px;
@@ -56,9 +54,7 @@ p {
     margin-top: 5px;
     font-size: 0.85em;
     padding: 5px 10px;
-    position: absolute;
-    top: 10px;
-    right: 10px;
+    position: relative;
 }
 
 .action-button:hover {
@@ -67,71 +63,4 @@ p {
 
 .logout-button:hover {
     background-color: #c0392b;
-}
-
-.search-section {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    margin-top: 20px;
-    margin-bottom: 15px;
-}
-
-#searchInput {
-    width: 70%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-#searchButton {
-    background-color: #0077cc;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#searchButton i {
-    margin-right: 5px;
-}
-
-#searchButton:hover {
-    background-color: #005fa3;
-}
-
-#results {
-    margin-top: 20px;
-    text-align: left;
-}
-
-.result-item {
-    border-bottom: 1px solid #ccc;
-    padding: 10px 0;
-}
-
-.result-item h3 {
-    margin: 0;
-    font-size: 1em;
-}
-
-.result-item p {
-    margin: 4px 0 0 0;
-    font-size: 0.85em;
-    color: #666;
-}
-
-.result-item a {
-    text-decoration: none;
-    color: #0077cc;
-    font-weight: bold;
-}
-
-.result-item a:hover {
-    text-decoration: underline;
 }
