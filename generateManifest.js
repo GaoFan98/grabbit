@@ -5,7 +5,7 @@ const manifest = {
     "manifest_version": 3,
     "name": "Grabbit",
     "description": "Quickly find your Google Drive files using natural language descriptions.",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "icons": {
         "128": "icons/icon128.png"
     },
@@ -36,6 +36,5 @@ const manifest = {
     }
 };
 
-// Write manifest to file
 fs.writeFileSync('manifest.json', JSON.stringify(manifest, null, 2));
 console.log('manifest.json generated successfully.');

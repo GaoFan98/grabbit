@@ -1,40 +1,42 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // Attempt to get auth token immediately when the popup opens
+    showLoginContainer();
+
     try {
-        const token = await getAuthToken();
+        const token = await getAuthToken(false);
         if (token) {
-            document.getElementById('loginStatus').textContent = "Logged in to Google Drive";
+            showSearchContainer();
         }
     } catch (error) {
         console.error('Authentication error:', error);
     }
 
-    // Search button click event
+    document.getElementById('loginButton').addEventListener('click', handleLogin);
+    document.getElementById('logoutButton').addEventListener('click', handleLogout);
     document.getElementById('searchButton').addEventListener('click', handleSearch);
 });
 
-async function handleSearch() {
-    const searchInput = document.getElementById('searchInput').value.trim();
-    if (!searchInput) {
-        alert('Please enter a description.');
-        return;
-    }
-
-    // Try getting an OAuth token if needed
+async function handleLogin() {
     try {
-        const token = await getAuthToken();
-
+        const token = await getAuthToken(true);
         if (token) {
-            const searchResults = await searchDriveFiles(token, searchInput);
-            displayResults(searchResults);
+            showSearchContainer();
         }
     } catch (error) {
-        console.error('Authentication error:', error);
+        console.error('Login error:', error);
         alert('Unable to authenticate with Google. Please try again.');
     }
 }
 
-// Function to get auth token
+function handleLogout() {
+    chrome.runtime.sendMessage({ action: 'removeAuthToken' }, (response) => {
+        if (response.success) {
+            showLoginContainer();
+        } else {
+            alert('Failed to logout. Please try again.');
+        }
+    });
+}
+
 function getAuthToken(interactive = true) {
     return new Promise((resolve, reject) => {
         chrome.identity.getAuthToken({ interactive: interactive }, (token) => {
@@ -48,7 +50,35 @@ function getAuthToken(interactive = true) {
     });
 }
 
-// Function to search Google Drive files based on the query
+function showLoginContainer() {
+    document.getElementById('loginContainer').style.display = 'block';
+    document.getElementById('searchContainer').style.display = 'none';
+}
+
+function showSearchContainer() {
+    document.getElementById('loginContainer').style.display = 'none';
+    document.getElementById('searchContainer').style.display = 'block';
+}
+
+async function handleSearch() {
+    const searchInput = document.getElementById('searchInput').value.trim();
+    if (!searchInput) {
+        alert('Please enter a description.');
+        return;
+    }
+
+    try {
+        const token = await getAuthToken();
+        if (token) {
+            const searchResults = await searchDriveFiles(token, searchInput);
+            displayResults(searchResults);
+        }
+    } catch (error) {
+        console.error('Authentication error:', error);
+        alert('Unable to authenticate with Google. Please try again.');
+    }
+}
+
 async function searchDriveFiles(token, query) {
     const url = `https://www.googleapis.com/drive/v3/files?q=name contains '${query}'&fields=files(id, name, mimeType, modifiedTime)&pageSize=10`;
 
@@ -64,7 +94,6 @@ async function searchDriveFiles(token, query) {
     return data.files;
 }
 
-// Function to display search results
 function displayResults(files) {
     const resultsDiv = document.getElementById('results');
     resultsDiv.innerHTML = '';

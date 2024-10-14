@@ -15,7 +15,8 @@ body {
 .header {
     padding-bottom: 10px;
     border-bottom: 2px solid #0077cc;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
+    position: relative;
 }
 
 .header h1 {
@@ -27,13 +28,45 @@ body {
     justify-content: center;
 }
 
-.header h1 i {
-    margin-right: 8px;
+.logo {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 10px;
 }
 
-#loginStatus {
-    font-size: 0.9em;
+p {
+    font-size: 1em;
     color: #333;
+    margin-bottom: 20px;
+}
+
+.action-button {
+    background-color: #0077cc;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-top: 15px;
+}
+
+.logout-button {
+    background-color: #e74c3c;
+    margin-top: 5px;
+    font-size: 0.85em;
+    padding: 5px 10px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.action-button:hover {
+    background-color: #005fa3;
+}
+
+.logout-button:hover {
+    background-color: #c0392b;
 }
 
 .search-section {
@@ -41,6 +74,7 @@ body {
     justify-content: center;
     align-items: center;
     gap: 10px;
+    margin-top: 20px;
     margin-bottom: 15px;
 }
 
