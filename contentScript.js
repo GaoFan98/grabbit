@@ -46,9 +46,9 @@ function insertDriveResults(results) {
         driveResultsDiv.style.backgroundColor = '#ffffff';
 
         driveResultsDiv.innerHTML = `
-            <div style="border-bottom: 1px solid #e0e0e0; padding-bottom: 10px; margin-bottom: 10px;">
+            <div style="border-bottom: 1px solid #e0e0e0; padding-bottom: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
                 <span style="font-weight: bold; color: #1a73e8; font-size: 1.2em;">Google Drive Results</span>
-                <span style="font-size: 0.85em; color: #5f6368; float: right;">Powered by Grabbit</span>
+               <img src="${chrome.runtime.getURL('icons/grabbit-icon.png')}" alt="Grabbit" style="height: 20px; width: 20px;" title="Powered by Grabbit">
             </div>
             <div>
                 ${results.map(result => `

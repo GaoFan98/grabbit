@@ -41,6 +41,12 @@ const manifest = {
             "js": ["contentScript.js"],
             "run_at": "document_end"
         }
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": ["icons/grabbit-icon.png"],
+            "matches": ["<all_urls>"]
+        }
     ]
 };
 
