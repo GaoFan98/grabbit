@@ -1,0 +1,103 @@
+/* popup.css */
+
+body {
+    font-family: 'Roboto', Arial, sans-serif;
+    width: 350px;
+    margin: 0;
+    padding: 20px;
+    background-color: #f5f7fa;
+}
+
+.container {
+    text-align: center;
+}
+
+.header {
+    padding-bottom: 10px;
+    border-bottom: 2px solid #0077cc;
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    font-size: 1.5em;
+    color: #0077cc;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header h1 i {
+    margin-right: 8px;
+}
+
+#loginStatus {
+    font-size: 0.9em;
+    color: #333;
+}
+
+.search-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+#searchInput {
+    width: 70%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#searchButton {
+    background-color: #0077cc;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#searchButton i {
+    margin-right: 5px;
+}
+
+#searchButton:hover {
+    background-color: #005fa3;
+}
+
+#results {
+    margin-top: 20px;
+    text-align: left;
+}
+
+.result-item {
+    border-bottom: 1px solid #ccc;
+    padding: 10px 0;
+}
+
+.result-item h3 {
+    margin: 0;
+    font-size: 1em;
+}
+
+.result-item p {
+    margin: 4px 0 0 0;
+    font-size: 0.85em;
+    color: #666;
+}
+
+.result-item a {
+    text-decoration: none;
+    color: #0077cc;
+    font-weight: bold;
+}
+
+.result-item a:hover {
+    text-decoration: underline;
+}

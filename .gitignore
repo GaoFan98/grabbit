@@ -1,0 +1,12 @@
+# Node modules (dependencies)
+node_modules/
+
+.env
+
+manifest.json
+
+.vscode/
+.idea/
+
+.DS_Store
+Thumbs.db

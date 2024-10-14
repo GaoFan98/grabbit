@@ -1,0 +1,14 @@
+{
+  "name": "grabbit-extension",
+  "version": "1.0.0",
+  "description": "Quickly find your Google Drive files using natural language descriptions.",
+  "main": "background.js",
+  "scripts": {
+    "build:manifest": "node generateManifest.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.0"
+  },
+  "author": "Your Name",
+  "license": "MIT"
+}
