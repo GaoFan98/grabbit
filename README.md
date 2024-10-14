@@ -63,7 +63,7 @@ Grabbit uses a content script that listens for Google search events. When the us
 
 Grabbit is an open source project aiming to create a more productive and efficient browsing experience. Contributions are welcome from developers, designers, and enthusiasts who share our vision of making personal and public information seamlessly accessible.
 
-- **Repository**: [GitHub Link] (https://github.com/GaoFan98/grabbit)
+- **Repository**: [https://github.com/GaoFan98/grabbit]
 - **License**: MIT License - We encourage the community to contribute, use, and adapt the project as needed.
 
 ### Feedback & Community
