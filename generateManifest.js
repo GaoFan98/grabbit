@@ -5,7 +5,7 @@ const manifest = {
     "manifest_version": 3,
     "name": "Grabbit",
     "description": "Enhance your Google searches with Google Drive results.",
-    "version": "1.0.5",
+    "version": "1.2.0",
     "icons": {
         "128": "icons/icon128.png"
     },
@@ -15,7 +15,8 @@ const manifest = {
         "activeTab",
         "scripting",
         "https://www.googleapis.com/",
-        "https://www.google.com/*"
+        "https://www.google.com/*",
+        'experimental'
     ],
     "oauth2": {
         "client_id": process.env.GOOGLE_CLIENT_ID,
