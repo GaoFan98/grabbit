@@ -1,23 +1,79 @@
 console.log('Grabbit Content Script loaded successfully.');
 
-function handleSearch() {
+async function handleSearch() {
     console.log('Attempting to handle search...');
 
     const searchInput = document.querySelector('input[name="q"]');
     if (!searchInput) {
-        console.warn('No search input found.');
+        console.log('No search input found.');
         return;
     }
 
-    const searchQuery = searchInput.value.trim();
+    let searchQuery = searchInput.value.trim();
     if (!searchQuery) {
-        console.warn('No search query found.');
+        console.log('No search query found.');
         return;
+    }
+
+    if (window.translation) {
+        try {
+            const canDetect = await translation.canDetect();
+            let detector;
+            if (canDetect !== 'no') {
+                if (canDetect === 'readily') {
+                    detector = await translation.createDetector();
+                } else {
+                    detector = await translation.createDetector();
+                    detector.addEventListener('downloadprogress', (e) => {
+                        console.log('Language detector download progress:', e.loaded, '/', e.total);
+                    });
+                    await detector.ready;
+                }
+                const results = await detector.detect(searchQuery);
+                if (results && results.length > 0) {
+                    const detectedLanguage = results[0].detectedLanguage;
+                    const confidence = results[0].confidence;
+                    console.log('Detected language:', detectedLanguage, 'Confidence:', confidence);
+                    if (detectedLanguage !== 'en') {
+                        const languagePair = {
+                            sourceLanguage: detectedLanguage,
+                            targetLanguage: 'en',
+                        };
+                        const canTranslate = await translation.canTranslate(languagePair);
+                        let translator;
+                        if (canTranslate !== 'no') {
+                            if (canTranslate === 'readily') {
+                                translator = await translation.createTranslator(languagePair);
+                            } else {
+                                translator = await translation.createTranslator(languagePair);
+                                translator.addEventListener('downloadprogress', (e) => {
+                                    console.log('Translator download progress:', e.loaded, '/', e.total);
+                                });
+                                await translator.ready;
+                            }
+                            const translatedQuery = await translator.translate(searchQuery);
+                            console.log('Translated query:', translatedQuery);
+                            searchQuery = translatedQuery;
+                        } else {
+                            console.log('Cannot translate from', detectedLanguage, 'to en.');
+                        }
+                    }
+                } else {
+                    console.log('No language detection results.');
+                }
+            } else {
+                console.log('Language detection API cannot be used.');
+            }
+        } catch (error) {
+            console.error('Error during language detection or translation:', error);
+        }
+    } else {
+        console.log('Translation API is not available.');
     }
 
     console.log('Sending search query to background script:', searchQuery);
 
-    chrome.runtime.sendMessage({ action: 'searchGoogleDrive', query: searchQuery }, (response) => {
+    chrome.runtime.sendMessage({action: 'searchGoogleDrive', query: searchQuery}, (response) => {
         if (response && response.results) {
             console.log('Received Google Drive results:', response.results);
             insertDriveResults(response.results);
@@ -27,7 +83,7 @@ function handleSearch() {
     });
 }
 
-function insertDriveResults(results) {
+async function insertDriveResults(results) {
     const searchResultsContainer = document.getElementById('search') || document.querySelector('.main');
     if (searchResultsContainer && results.length > 0) {
         console.log('Inserting Google Drive results into the Google search results.');
@@ -64,7 +120,7 @@ function insertDriveResults(results) {
 
         searchResultsContainer.prepend(driveResultsDiv);
     } else {
-        console.warn('No Google search results container found or no Google Drive results to insert.');
+        console.log('No Google search results container found or no Google Drive results to insert.');
     }
 }
 
@@ -78,7 +134,7 @@ function listenForURLChanges() {
             console.log('URL changed, handling new search.');
             handleSearch();
         }
-    }).observe(document, { subtree: true, childList: true });
+    }).observe(document, {subtree: true, childList: true});
 }
 
 window.addEventListener('load', () => {
