@@ -20,7 +20,7 @@ async function handleSearch() {
     console.log('Sending request to fetch all Google Drive documents.');
 
     // Fetch all documents from Google Drive
-    chrome.runtime.sendMessage({ action: 'fetchAllGoogleDriveDocs' }, async (response) => {
+    chrome.runtime.sendMessage({action: 'fetchAllGoogleDriveDocs'}, async (response) => {
         if (chrome.runtime.lastError) {
             console.log('Runtime error:', chrome.runtime.lastError);
             return;
@@ -28,7 +28,7 @@ async function handleSearch() {
         if (response && response.results) {
             console.log('Received all Google Drive documents:', response.results);
 
-            // Now process the documents with Gemini API
+            // Process the documents with Gemini API
             await processWithGeminiAPI(response.results, searchQuery);
         } else {
             console.log('No results received or error:', response ? response.error : 'Unknown error');
@@ -41,24 +41,19 @@ async function processWithGeminiAPI(results, searchQuery) {
     if (searchResultsContainer && results.length > 0) {
         console.log('Processing results with Gemini API.');
 
-        // Prepare the prompt exactly as specified
         const documentNames = results.map((result) => result.name);
+        const MAX_PROMPT_SIZE = 15000;
 
-        // Limit the prompt size to avoid exceeding Gemini API payload limit
-        const MAX_PROMPT_SIZE = 15000; // Adjust as needed to stay within payload limit
-
-        const { promptText, includedDocumentNames } = buildLimitedPrompt(documentNames, searchQuery, MAX_PROMPT_SIZE);
+        const {promptText, includedDocumentNames} = buildLimitedPrompt(documentNames, searchQuery, MAX_PROMPT_SIZE);
 
         console.log(`Including ${includedDocumentNames.length} documents in the prompt to Gemini API due to payload size limits.`);
-
         console.log('Prompt for Gemini API:', promptText);
 
-        let sortedResults = results;
+        let sortedResults = [];
 
-        // Use the Gemini API
         try {
-            // Ensure you store your API key securely
-            const apiKey = 'AIzaSyBCIzslerMGE5OGLgrUMVbAr4-RGaiV3U8'; // Replace with your actual Gemini API key
+
+            const apiKey = 'AIzaSyBCIzslerMGE5OGLgrUMVbAr4-RGaiV3U8';
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
             const requestBody = {
@@ -83,41 +78,38 @@ async function processWithGeminiAPI(results, searchQuery) {
 
             if (response.ok) {
                 const data = await response.json();
-                console.log({ 'Gemini API Response': data });
+                console.log({'Gemini API Response': data});
 
                 if (data && data.candidates && data.candidates.length > 0) {
-                    // Access the generated text from the response
                     const aiRes = data.candidates[0].content.parts[0].text;
 
-                    // Parse the AI result
+                    console.log('AI Response:', aiRes);
+
                     const sortedDocumentNames = aiRes
                         .split('\n')
                         .map((name) => name.replace(/^- /, '').trim())
                         .filter((name) => name);
 
-                    // Create a map from document name to result object
-                    const includedResults = results.filter((result) => includedDocumentNames.includes(result.name));
-                    const resultMap = new Map(includedResults.map((result) => [result.name, result]));
+                    console.log('Parsed Document Names:', sortedDocumentNames);
 
-                    // Reorder the results based on AI's sorted document names
-                    sortedResults = sortedDocumentNames.map((name) => resultMap.get(name)).filter((result) => result);
+                    const includedDocumentIds = new Set();
 
-                    // Append any documents not included in the AI's response at the end
-                    const remainingResults = results.filter((result) => !sortedResults.includes(result));
-                    sortedResults = sortedResults.concat(remainingResults);
-
-                    console.log('Result Map', {
-                        resultMap,
-                        sortedResults,
-                        sortedDocumentNames,
-                        remainingResults,
+                    sortedDocumentNames.forEach((name) => {
+                        const matchingDocs = results.filter(
+                            (doc) => doc.name === name && !includedDocumentIds.has(doc.id)
+                        );
+                        matchingDocs.forEach((doc) => {
+                            sortedResults.push(doc);
+                            includedDocumentIds.add(doc.id);
+                        });
                     });
 
-                    // Fetch detailed information about the matched documents
+                    console.log('Sorted Results before fetching details:', sortedResults);
+
+                    // Fetch data about matched documents
                     const sortedDocumentIds = sortedResults.map((result) => result.id);
                     const detailedResults = await fetchDocumentDetails(sortedDocumentIds);
 
-                    // Display the detailed results
                     displayDriveResults(detailedResults, searchResultsContainer);
                 } else {
                     console.log('Invalid response from Gemini API:', data);
@@ -135,7 +127,6 @@ async function processWithGeminiAPI(results, searchQuery) {
 }
 
 
-
 function buildLimitedPrompt(documentNames, searchQuery, maxPromptSize) {
     const promptHeader = `Given the following list of documents:\n`;
     const promptFooter = `\nPlease sort these documents from most to least relevant to the query "${searchQuery}". Only provide the sorted list without any additional explanations. Give only the list of properly sorted documents, nothing additional.`;
@@ -150,7 +141,7 @@ function buildLimitedPrompt(documentNames, searchQuery, maxPromptSize) {
     }
     promptText += promptFooter;
 
-    return { promptText, includedDocumentNames };
+    return {promptText, includedDocumentNames};
 }
 
 function displayDriveResults(detailedResults, container) {
@@ -196,7 +187,7 @@ function displayDriveResults(detailedResults, container) {
 
 async function fetchDocumentDetails(docIds) {
     return new Promise((resolve, reject) => {
-        chrome.runtime.sendMessage({ action: 'getDocumentDetails', ids: docIds }, (response) => {
+        chrome.runtime.sendMessage({action: 'getDocumentDetails', ids: docIds}, (response) => {
             if (chrome.runtime.lastError) {
                 console.log('Runtime error:', chrome.runtime.lastError);
                 reject(chrome.runtime.lastError);
@@ -221,7 +212,7 @@ function listenForURLChanges() {
             console.log('URL changed, handling new search.');
             handleSearch();
         }
-    }).observe(document, { subtree: true, childList: true });
+    }).observe(document, {subtree: true, childList: true});
 }
 
 window.addEventListener('load', () => {
