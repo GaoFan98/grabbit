@@ -1,5 +1,3 @@
-// background.js
-
 chrome.runtime.onInstalled.addListener(() => {
     console.log('Grabbit extension installed.');
 });

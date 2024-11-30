@@ -1,4 +1,3 @@
-// contentScript.js
 console.log('Grabbit Content Script loaded successfully.');
 
 async function handleSearch() {
@@ -27,7 +26,7 @@ async function handleSearch() {
         if (response && response.results) {
             console.log('Received all Google Drive documents:', response.results);
 
-            // Process the documents with Prompt API and fallback to Gemini API if needed
+            // Process the documents with Prompt API and fallback to Gemini API if needed (temporary solution till Promp API works better
             await processResults(response.results, searchQuery);
         } else {
             console.log('No results received or error:', response ? response.error : 'Unknown error');
@@ -223,12 +222,12 @@ function displayDriveResults(detailedResults, container) {
 
     driveResultsDiv.innerHTML = `
     <div style="border-bottom: 1px solid #e0e0e0; padding-bottom: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
-        <span style="font-weight: bold; color: #1a73e8; font-size: 1.2em;">Google Drive Results</span>
+        <span style="font-weight: bold; color: #cf3e3d; font-size: 1.2em;">Grabbit Google Drive Results</span>
        <img src="${chrome.runtime.getURL('icons/grabbit-icon.png')}" alt="Grabbit" style="height: 20px; width: 20px;" title="Powered by Grabbit">
     </div>
     <div id="resultsContainer">
     </div>
-    <button id="showMoreButton" style="display: block; margin: 20px auto; padding: 10px 20px; font-size: 1em; color: #ffffff; background-color: #1a73e8; border: none; border-radius: 5px; cursor: pointer;">Show More</button>
+    <button id="showMoreButton" style="display: block; margin: 20px auto; padding: 10px 20px; font-size: 1em; color: #ffffff; background-color: #cf3e3d; border: none; border-radius: 5px; cursor: pointer;">Show More</button>
   `;
 
     container.prepend(driveResultsDiv);
