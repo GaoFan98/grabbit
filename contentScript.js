@@ -52,14 +52,12 @@ async function processWithPromptAPI(results, searchQuery) {
         let sortedResults = [];
 
         try {
-            // Check if Prompt API is available
             const capabilities = await ai.languageModel.capabilities();
             if (capabilities.available !== 'readily') {
                 console.log('Prompt API is not readily available. Falling back to Gemini API.');
-                return false; // Trigger fallback to Gemini API
+                return false;
             }
 
-            // Create a session for the Prompt API
             const session = await ai.languageModel.create();
             const result = await session.prompt(promptText);
 
@@ -86,19 +84,18 @@ async function processWithPromptAPI(results, searchQuery) {
 
             console.log('Sorted Results before fetching details:', sortedResults);
 
-            // Fetch data about matched documents
             const sortedDocumentIds = sortedResults.map((result) => result.id);
             const detailedResults = await fetchDocumentDetails(sortedDocumentIds);
 
             displayDriveResults(detailedResults, searchResultsContainer);
-            return true; // Prompt API succeeded
+            return true;
         } catch (error) {
             console.error('Error during Prompt API processing:', error);
-            return false; // Trigger fallback to Gemini API
+            return false;
         }
     } else {
         console.log('No Google search results container found or no Google Drive results to insert.');
-        return false; // Trigger fallback to Gemini API
+        return false;
     }
 }
 
@@ -172,7 +169,6 @@ async function processWithGeminiAPI(results, searchQuery) {
 
                     console.log('Sorted Results before fetching details:', sortedResults);
 
-                    // Fetch data about matched documents
                     const sortedDocumentIds = sortedResults.map((result) => result.id);
                     const detailedResults = await fetchDocumentDetails(sortedDocumentIds);
 
@@ -277,7 +273,6 @@ function displayDriveResults(detailedResults, container) {
 
     showMoreButton.addEventListener('click', renderNextBatch);
 
-    // Load the first batch initially
     renderNextBatch();
 }
 

@@ -53,12 +53,11 @@ async function fetchAllGoogleDriveDocs() {
         const files = [];
         let pageToken = null;
 
-        // Define the query for PDF and DOC files
         const mimeTypes = [
             "'application/pdf'",
-            "'application/vnd.google-apps.document'",
-            "'application/vnd.openxmlformats-officedocument.wordprocessingml.document'",
-            "'application/msword'"
+            // "'application/vnd.google-apps.document'",
+            // "'application/vnd.openxmlformats-officedocument.wordprocessingml.document'",
+            // "'application/msword'"
         ];
         const mimeTypeQuery = mimeTypes.map(type => `mimeType=${type}`).join(' or ');
         const query = `(${mimeTypeQuery})`;
