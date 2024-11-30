@@ -158,11 +158,26 @@ function displayDriveResults(detailedResults, container) {
         <span style="font-weight: bold; color: #1a73e8; font-size: 1.2em;">Google Drive Results</span>
        <img src="${chrome.runtime.getURL('icons/grabbit-icon.png')}" alt="Grabbit" style="height: 20px; width: 20px;" title="Powered by Grabbit">
     </div>
-    <div>
-        ${detailedResults
-        .map(
-            (result) => `
-            <div class="drive-result-item" style="margin-bottom: 20px;">
+    <div id="resultsContainer">
+    </div>
+    <button id="showMoreButton" style="display: block; margin: 20px auto; padding: 10px 20px; font-size: 1em; color: #ffffff; background-color: #1a73e8; border: none; border-radius: 5px; cursor: pointer;">Show More</button>
+  `;
+
+    container.prepend(driveResultsDiv);
+
+    const resultsContainer = driveResultsDiv.querySelector('#resultsContainer');
+    const showMoreButton = driveResultsDiv.querySelector('#showMoreButton');
+
+    let currentIndex = 0;
+    const pageSize = 5;
+
+    function renderNextBatch() {
+        const nextBatch = detailedResults.slice(currentIndex, currentIndex + pageSize);
+        nextBatch.forEach((result) => {
+            const resultItem = document.createElement('div');
+            resultItem.className = 'drive-result-item';
+            resultItem.style.marginBottom = '20px';
+            resultItem.innerHTML = `
                 <a href="https://drive.google.com/file/d/${result.id}/view" target="_blank" style="color: #1a0dab; font-size: 1.1em; font-weight: bold; text-decoration: none;">
                     ${result.name}
                 </a>
@@ -175,15 +190,23 @@ function displayDriveResults(detailedResults, container) {
                     ? `<p style="font-size: 0.9em; color: #4d5156;">Description: ${result.description}</p>`
                     : ''
             }
-            </div>
-        `
-        )
-        .join('')}
-    </div>
-  `;
+            `;
+            resultsContainer.appendChild(resultItem);
+        });
 
-    container.prepend(driveResultsDiv);
+        currentIndex += pageSize;
+
+        if (currentIndex >= detailedResults.length) {
+            showMoreButton.style.display = 'none';
+        }
+    }
+
+    showMoreButton.addEventListener('click', renderNextBatch);
+
+    // Load the first batch initially
+    renderNextBatch();
 }
+
 
 async function fetchDocumentDetails(docIds) {
     return new Promise((resolve, reject) => {
