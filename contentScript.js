@@ -1,5 +1,4 @@
 // contentScript.js
-
 console.log('Grabbit Content Script loaded successfully.');
 
 async function handleSearch() {
@@ -44,7 +43,7 @@ async function processWithPromptAPI(results, searchQuery) {
         const documentNames = results.map((result) => result.name);
         const MAX_PROMPT_SIZE = 15000;
 
-        const { promptText, includedDocumentNames } = buildLimitedPrompt(documentNames, searchQuery, MAX_PROMPT_SIZE);
+        const {promptText, includedDocumentNames} = buildLimitedPrompt(documentNames, searchQuery, MAX_PROMPT_SIZE);
 
         console.log(`Including ${includedDocumentNames.length} documents in the prompt to Prompt API due to payload size limits.`);
         console.log('Prompt for Prompt API:', promptText);
@@ -115,9 +114,8 @@ async function processWithGeminiAPI(results, searchQuery) {
         let sortedResults = [];
 
         try {
-
-            const apiKey = 'AIzaSyBCIzslerMGE5OGLgrUMVbAr4-RGaiV3U8';
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+            const apiKey = CONFIG.API_KEY;
+            const apiUrl = CONFIG.API_URL + apiKey;
 
             const requestBody = {
                 contents: [
