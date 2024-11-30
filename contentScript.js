@@ -28,12 +28,78 @@ async function handleSearch() {
         if (response && response.results) {
             console.log('Received all Google Drive documents:', response.results);
 
-            // Process the documents with Gemini API
-            await processWithGeminiAPI(response.results, searchQuery);
+            // Process the documents with Prompt API and fallback to Gemini API if needed
+            await processResults(response.results, searchQuery);
         } else {
             console.log('No results received or error:', response ? response.error : 'Unknown error');
         }
     });
+}
+
+async function processWithPromptAPI(results, searchQuery) {
+    const searchResultsContainer = document.getElementById('search') || document.querySelector('.main');
+    if (searchResultsContainer && results.length > 0) {
+        console.log('Processing results with Prompt API.');
+
+        const documentNames = results.map((result) => result.name);
+        const MAX_PROMPT_SIZE = 15000;
+
+        const { promptText, includedDocumentNames } = buildLimitedPrompt(documentNames, searchQuery, MAX_PROMPT_SIZE);
+
+        console.log(`Including ${includedDocumentNames.length} documents in the prompt to Prompt API due to payload size limits.`);
+        console.log('Prompt for Prompt API:', promptText);
+
+        let sortedResults = [];
+
+        try {
+            // Check if Prompt API is available
+            const capabilities = await ai.languageModel.capabilities();
+            if (capabilities.available !== 'readily') {
+                console.log('Prompt API is not readily available. Falling back to Gemini API.');
+                return false; // Trigger fallback to Gemini API
+            }
+
+            // Create a session for the Prompt API
+            const session = await ai.languageModel.create();
+            const result = await session.prompt(promptText);
+
+            console.log('Prompt API Response:', result);
+
+            const sortedDocumentNames = result
+                .split('\n')
+                .map((name) => name.replace(/^- /, '').trim())
+                .filter((name) => name);
+
+            console.log('Parsed Document Names from Prompt API:', sortedDocumentNames);
+
+            const includedDocumentIds = new Set();
+
+            sortedDocumentNames.forEach((name) => {
+                const matchingDocs = results.filter(
+                    (doc) => doc.name === name && !includedDocumentIds.has(doc.id)
+                );
+                matchingDocs.forEach((doc) => {
+                    sortedResults.push(doc);
+                    includedDocumentIds.add(doc.id);
+                });
+            });
+
+            console.log('Sorted Results before fetching details:', sortedResults);
+
+            // Fetch data about matched documents
+            const sortedDocumentIds = sortedResults.map((result) => result.id);
+            const detailedResults = await fetchDocumentDetails(sortedDocumentIds);
+
+            displayDriveResults(detailedResults, searchResultsContainer);
+            return true; // Prompt API succeeded
+        } catch (error) {
+            console.error('Error during Prompt API processing:', error);
+            return false; // Trigger fallback to Gemini API
+        }
+    } else {
+        console.log('No Google search results container found or no Google Drive results to insert.');
+        return false; // Trigger fallback to Gemini API
+    }
 }
 
 async function processWithGeminiAPI(results, searchQuery) {
@@ -126,6 +192,14 @@ async function processWithGeminiAPI(results, searchQuery) {
     }
 }
 
+async function processResults(results, searchQuery) {
+    console.log('Attempting to process results with Prompt API...');
+    const promptSuccess = await processWithPromptAPI(results, searchQuery);
+    if (!promptSuccess) {
+        console.log('Prompt API failed. Falling back to Gemini API...');
+        await processWithGeminiAPI(results, searchQuery);
+    }
+}
 
 function buildLimitedPrompt(documentNames, searchQuery, maxPromptSize) {
     const promptHeader = `Given the following list of documents:\n`;
