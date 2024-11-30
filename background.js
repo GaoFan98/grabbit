@@ -26,6 +26,33 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 sendResponse({ error: error.message });
             });
         return true;
+    }  else if (request.action === 'removeAuthToken') {
+        chrome.identity.getAuthToken({ interactive: false }, (token) => {
+            if (chrome.runtime.lastError) {
+                console.log('Error getting auth token for revocation:', chrome.runtime.lastError);
+                sendResponse({ success: false });
+                return;
+            }
+
+            if (token) {
+                chrome.identity.removeCachedAuthToken({ token }, () => {
+                    fetch(`https://accounts.google.com/o/oauth2/revoke?token=${token}`, {
+                        method: 'GET',
+                    })
+                        .then(() => {
+                            console.log('Token revoked successfully.');
+                            sendResponse({ success: true });
+                        })
+                        .catch((error) => {
+                            console.log('Error revoking token:', error);
+                            sendResponse({ success: false });
+                        });
+                });
+            } else {
+                sendResponse({ success: false });
+            }
+        });
+        return true;
     }
 });
 

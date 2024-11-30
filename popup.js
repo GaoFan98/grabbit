@@ -27,9 +27,10 @@ async function handleLogin() {
 }
 
 function handleLogout() {
-    chrome.runtime.sendMessage({ action: 'removeAuthToken' }, (response) => {
+    chrome.runtime.sendMessage({action: 'removeAuthToken'}, (response) => {
         if (response.success) {
             showLoginContainer();
+            alert('Logged out successfully.');
         } else {
             alert('Failed to logout. Please try again.');
         }
@@ -38,7 +39,7 @@ function handleLogout() {
 
 function getAuthToken(interactive = true) {
     return new Promise((resolve, reject) => {
-        chrome.identity.getAuthToken({ interactive: interactive }, (token) => {
+        chrome.identity.getAuthToken({interactive: interactive}, (token) => {
             if (chrome.runtime.lastError) {
                 console.error(chrome.runtime.lastError);
                 reject(chrome.runtime.lastError);
