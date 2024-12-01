@@ -62,3 +62,4 @@ Grabbit leverages modern web technologies and Google Chrome's AI capabilities:
 ## Contribution
 
 - **Repository**: [https://github.com/GaoFan98/grabbit]
+- **License**: This project is licensed under the [MIT License](./LICENSE).
